@@ -113,6 +113,7 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
+    
     def do_create(self, args):
         """ Create an object of any class"""
         if not args:
@@ -123,34 +124,28 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
             return
         new_instance = HBNBCommand.classes[args[0]]()
-        storage.save()
+        for i in range(1, len(args)):
+            kwargs = args[i].split("=")
+            if kwargs[1][0] == "\"":
+                value = kwargs[1].replace("\"", "")\
+                    .replace("\'", "").replace("_", " ")
+                setattr(new_instance, kwargs[0], value)
+            elif "." in kwargs[1]:
+                try:
+                    value = float(kwargs[1])
+                    setattr(new_instance, kwargs[0], value)
+                except:
+                    pass
+            else:
+                try:
+                    value = int(kwargs[1])
+                    setattr(new_instance, kwargs[0], value)
+                except:
+                    pass
+        storage.new(new_instance)
         print(new_instance.id)
         storage.save()
-        if len(args) > 1:
-            key = args[0] + "." + new_instance.id
-            objects = storage.all()
-            new_dict = objects[key]
-            for i in range(1, len(args)):
-                kwargs = args[i].split("=")
-                if kwargs[1][0] == "\"":
-                    value = kwargs[1].replace("\"", "")\
-                        .replace("\'", "").replace("_", " ")
-                    setattr(new_dict, kwargs[0], value)
-                    storage.save()
-                elif '.' in kwargs[1]:
-                    try:
-                        value = float(kwargs[1])
-                        setattr(new_dict, kwargs[0], value)
-                        storage.save()
-                    except:
-                        pass
-                else:
-                    try:
-                        value = int(kwargs[1])
-                        setattr(new_dict, kwargs[0], value)
-                        storage.save()
-                    except:
-                        pass
+
     def help_create(self):
         """ Help information for the create method """
         print("Creates a class of any type")
