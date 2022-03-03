@@ -47,9 +47,10 @@ class DBStorage:
         from models.amenity import Amenity
         from models.review import Review
         # query on the current database session (self.__session) all objects depending of the class name (argument cls)
+        new_dict = {}
+
         if cls!=None:
             objects = self.__session.query(cls).all()
-            new_dict = {}
             for i in objects:
                 key = object.__class__.__name__ + "." + object.id
                 new_dict.update({key: i})
@@ -59,23 +60,22 @@ class DBStorage:
             state = self.all(State)
             new_dict2.update(new_dict)
             user = self.all(User)
-            new_dict2.update(new_dict) 
+            new_dict2.update(new_dict)
             user = self.all(City)
             new_dict2.update(new_dict)
             user = self.all(Amenity)
-            new_dict2.update(new_dict) 
+            new_dict2.update(new_dict)
             user = self.all(Place)
-            new_dict2.update(new_dict) 
+            new_dict2.update(new_dict)
             user = self.all(Review)
-            new_dict2.update(new_dict) 
+            new_dict2.update(new_dict)
             return(new_dict2)
-            
-            
+
     def new(self, obj):
         """ add an object to the session
         """
         self.__session.add(obj)
-    
+
     def save(self, obj):
         """ save an object to the session
         """
