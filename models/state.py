@@ -1,16 +1,17 @@
-#!/usr/bin/python3
 """ State Module for HBNB project """
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 import os
-from models import storage
 from models.city import City
+import models
 
 
 class State(BaseModel, Base):
     """ State class """
     __tablename__ = 'states'
+   # __table_args__ = {'extend_existing': True}
+
     name = Column(String(128), nullable=False)
 
     if os.getenv("HBNB_TYPE_STORAGE") == "db":
@@ -20,7 +21,7 @@ class State(BaseModel, Base):
         @property
         def cities(self):
             """getter that returns list of City instances with matching ids"""
-            objects = storage.all(City)
+            objects = models.storage.all(City)
             my_list = []
             for value in objects.values():
                 if self.id == value.state_id:
