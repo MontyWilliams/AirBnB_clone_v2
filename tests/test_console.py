@@ -42,7 +42,11 @@ class TestConsole(unittest.TestCase):
             self.console.do_quit("quit")
 
 
- #   def test_do_create(self):
- #       self.console.User.create(potato="yes")
- #       with open("file.json", "r") as file:
- #           self.assertEqual(file.read(), "test")
+    def test_do_create(self):
+        self.console.do_create("User first_name=\"dave\"")
+        with open("file.json", "r") as file:
+            for line in file:
+                if "first_name" in line:
+                    if "dave" in line:
+                        first_name = "first_name: dave"
+            self.assertEqual(first_name, "first_name: dave")
