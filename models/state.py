@@ -10,8 +10,6 @@ import models
 class State(BaseModel, Base):
     """ State class """
     __tablename__ = 'states'
-   # __table_args__ = {'extend_existing': True}
-
     name = Column(String(128), nullable=False)
 
     if os.getenv("HBNB_TYPE_STORAGE") == "db":

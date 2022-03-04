@@ -2,14 +2,9 @@
 """This module defines a class to manage file storage for using a database
 """
 import os
-
 from models.base_model import Base, BaseModel
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, session, scoped_session
-# from importlib_metadata import metadata
-
-
-
 
 
 class DBStorage:
@@ -28,10 +23,11 @@ class DBStorage:
         passwd = os.getenv("HBNB_MYSQL_PWD")
         host = os.getenv("HBNB_MYSQL_HOST")
         db = os.getenv("HBNB_MYSQL_DB")
-        
+
         self.__engine = create_engine('{}+{}://{}:{}@{}/{}'
-                                .format(dialect, driver, user, passwd, host,
-                            db), pool_pre_ping=True)
+                                      .format(dialect, driver,
+                                              user, passwd, host,
+                                              db), pool_pre_ping=True)
         env = os.getenv("HBNB_ENV")
         if env == 'test':
             Base.metadata.drop_all(self.__engine)
@@ -46,37 +42,30 @@ class DBStorage:
         from models.city import City
         from models.amenity import Amenity
         from models.review import Review
-        # query on the current database session (self.__session) all objects depending of the class name (argument cls)
-        new_dict = {}
 
-        if cls!=None:
-            objects = self.__session.query(cls).all()
-            for i in objects:
-                key = object.__class__.__name__ + "." + object.id
-                new_dict.update({key: i})
-            return(new_dict)
-        else:
-            new_dict2 = {}
-            state = self.all(State)
-            new_dict2.update(new_dict)
-            user = self.all(User)
-            new_dict2.update(new_dict)
-            user = self.all(City)
-            new_dict2.update(new_dict)
-            user = self.all(Amenity)
-            new_dict2.update(new_dict)
-            user = self.all(Place)
-            new_dict2.update(new_dict)
-            user = self.all(Review)
-            new_dict2.update(new_dict)
-            return(new_dict2)
+        classes = {
+            "Amenity": Amenity,
+            "City": City,
+            "Place": Place,
+            "State": State,
+            "User": User,
+            "Review": Review
+        }
+        my_dict = {}
+        for i in classes:
+            if cls is None or cls == i:
+                our_objs = self.__session.query(classes[i]).all()
+                for obj in our_objs:
+                    key = obj.__class__.__name__ + "." + obj.id
+                    my_dict.update({key: obj})
+        return (my_dict)
 
     def new(self, obj):
         """ add an object to the session
         """
         self.__session.add(obj)
 
-    def save(self, obj):
+    def save(self):
         """ save an object to the session
         """
         self.__session.commit()
@@ -97,8 +86,9 @@ class DBStorage:
         from models.city import City
         from models.amenity import Amenity
         from models.review import Review
-        
+
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        session_factory = sessionmaker(bind=self.__engine,
+                                       expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
