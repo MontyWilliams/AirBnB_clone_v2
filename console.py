@@ -134,13 +134,13 @@ class HBNBCommand(cmd.Cmd):
                     value = float(kwargs[1])
                     setattr(new_instance, kwargs[0], value)
                 except:
-                    pass
+                    flag = 0
             else:
                 try:
                     value = int(kwargs[1])
                     setattr(new_instance, kwargs[0], value)
                 except:
-                    pass
+                    flag = 0
         storage.new(new_instance)
         print(new_instance.id)
         storage.save()
