@@ -13,7 +13,7 @@ import sys
 class TestConsole(unittest.TestCase):
     """class for testing console of airbnb clone"""
 
-    console = console.HBNB.Command()
+    console = console.HBNBCommand()
 
     def __init__(self, *args, **kwargs):
         """ """
@@ -39,13 +39,10 @@ class TestConsole(unittest.TestCase):
 
     def test_do_quit(self):
         with self.assertRaises(SystemExit):
-            self.console.do_quit()
+            self.console.do_quit("quit")
 
-    def test_do_EOF(self):
-        with self.assertRaises(SystemExit):
-            self.console.do_EOF()
 
-    def test_do_create(self):
-        self.console.User.create(potato="yes")
-        with open("file.json", "r") as file:
-            self.assertEqual(file.read(), "test")
+ #   def test_do_create(self):
+ #       self.console.User.create(potato="yes")
+ #       with open("file.json", "r") as file:
+ #           self.assertEqual(file.read(), "test")
