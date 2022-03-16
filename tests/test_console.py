@@ -23,7 +23,7 @@ class TestConsole(unittest.TestCase):
 
     def setUp(self):
         """ """
-        jfile= "file.son"
+        jfile= "file.json"
         if os.path.exists(jfile):
             os.remove(jfile)
 
