@@ -5,7 +5,13 @@ import os
 from models.base_model import Base, BaseModel
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, session, scoped_session
-
+from models.base_model import BaseModel, Base
+from models.user import User
+from models.place import Place
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 
 class DBStorage:
     """This class manages storage of hbnb models in SQL format
@@ -35,14 +41,6 @@ class DBStorage:
     def all(self, cls=None):
         """ import modules
         """
-        from models.base_model import BaseModel, Base
-        from models.user import User
-        from models.place import Place
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.review import Review
-
         classes = {
             "Amenity": Amenity,
             "City": City,
@@ -76,19 +74,16 @@ class DBStorage:
         if obj:
             self.__session.delete(obj)
 
+
     def reload(self):
         """ This method sets the engine and loads the session
         """
-        from models.base_model import BaseModel, Base
-        from models.user import User
-        from models.place import Place
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.review import Review
-
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine,
-                                       expire_on_commit=False)
-        Session = scoped_session(session_factory)
-        self.__session = Session()
+        self.__session = scoped_session(sessionmaker(bind=self.__engine,
+                                        expire_on_commit=False))
+
+
+    def close(self):
+        """ remove
+        """
+        self.__session.remove()
