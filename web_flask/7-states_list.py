@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-"""starts a Flask web application"""
+"""starts a Flask web application
+"""
 from flask import Flask
 from flask import render_template
 from models import storage
@@ -10,13 +11,15 @@ app.url_map.strict_slashes = False
 
 @app.teardown_appcontext
 def teardown_db(exception):
-    """tears down database"""
+    """tears down database
+    """
     storage.close()
 
 
 @app.route('/states_list')
 def states_list():
-    """returns HTML page"""
+    """returns HTML page
+    """
     states = storage.all(State)
     return render_template('7-states_list.html', states=states)
 
