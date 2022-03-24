@@ -10,16 +10,15 @@ class FileStorage:
 
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
-        if cls:
-            new_dict = {}
-            for i in FileStorage.__objects.keys():
-                obj = i.split(".")
-                if obj[0] == cls.__name__:
-                    obj = ".".join(obj)
-                    new_dict.update({i: FileStorage.__objects[i]})
-            return(new_dict)
-        else:
+        if cls is None:
             return FileStorage.__objects
+        else:
+            cls_dict = {}
+            for key in FileStorage.__objects:
+                tmp = key.split('.')
+                if tmp[0] == cls.__name__:
+                    cls_dict[key] = FileStorage.__objects[key]
+            return cls_dict
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -34,14 +33,6 @@ class FileStorage:
                 temp[key] = val.to_dict()
             json.dump(temp, f)
 
-    def delete(self, obj=None):
-        """deletes an object from __objects"""
-        if obj is not None:
-            objects = self.all()
-            key = str(obj.__class__.__name__) + "." + str(obj.id)
-            del objects[key]
-            self.save()
-
     def reload(self):
         """Loads storage dictionary from file"""
         from models.base_model import BaseModel
@@ -51,6 +42,7 @@ class FileStorage:
         from models.city import City
         from models.amenity import Amenity
         from models.review import Review
+
         classes = {
                     'BaseModel': BaseModel, 'User': User, 'Place': Place,
                     'State': State, 'City': City, 'Amenity': Amenity,
@@ -64,9 +56,15 @@ class FileStorage:
                     self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
-    
+
+    def delete(self, obj=None):
+        """Deletes an object passed in"""
+        if obj is None:
+            return
+        objs = self.all()
+        tmp = str(obj.__class__.__name__) + '.' + str(obj.id)
+        del objs[tmp]
+        self.save()
 
     def close(self):
-         """remove() method on the private sessionclass
-         """
-         self.reload()
+        FileStorage.reload()

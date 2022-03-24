@@ -2,9 +2,17 @@
 """This module defines a class to manage file storage for using a database
 """
 import os
-from models.base_model import Base, BaseModel
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, session, scoped_session
+import models
+from models.amenity import Amenity
+from models.base_model import BaseModel, Base
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
+from os import getenv
 
 
 class DBStorage:
@@ -33,26 +41,18 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """ import modules
-        """
-        from models.base_model import BaseModel, Base
-        from models.user import User
-        from models.place import Place
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.review import Review
-
+        """Retrieves all objects from session"""
         classes = (City, State, User, Place, Amenity, Review)
-        
-        my_dict = {}
-        for i in classes:
-            if cls is None or cls == i:
-                our_objs = self.__session.query(classes[i]).all()
-                for obj in our_objs:
-                    key = obj.__class__.__name__ + "." + obj.id
-                    my_dict.update({key: obj})
-        return (my_dict)
+
+        all_dict = {}
+        if cls is None:
+            for i in classes:
+                for obj in self.__session.query(i):
+                    all_dict["{}.{}".format(i.__name__, obj.id)] = obj
+        elif cls in classes:
+            for obj in self.__session.query(cls):
+                all_dict["{}.{}".format(cls.__name__, obj.id)] = obj
+        return all_dict
 
     def new(self, obj):
         """ add an object to the session
@@ -71,18 +71,12 @@ class DBStorage:
             self.__session.delete(obj)
 
     def reload(self):
-        """ This method sets the engine and loads the session
-        """
-
-
+        """Retrieves all objects on start-up"""
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine,
-                                       expire_on_commit=False)
-        Session = scoped_session(session_factory)
-        self.__session = Session()
-
+        session_rel = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        Session = scoped_session(session_rel)
+        self.__session = Session
 
     def close(self):
-        """ remove
-        """
+        """calls remove method on private session attribute"""
         self.__session.remove()
